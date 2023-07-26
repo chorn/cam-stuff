@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# set -euxo pipefail
+
+declare _base=$(
+  _program="$0"
+    case "$_program" in
+          */*) ;;
+          *) _program=$(command -v -- "$0") ;;
+    esac
+    [[ -L "$_program" ]] && _program=$(readlink "$_program")
+    cd -P -- "$(dirname -- "$_program")" && pwd -P
+)
+
+declare _me=$(basename "$0")
+declare _env=.${_me}
+declare _lib=${_base}/cam.sh
+
+[[ -s "$_lib" ]] || exit 1
+[[ -s "$_env" ]] || exit 1
+
+source "$_env"
+source "$_lib"
+
+WAYLAND_DISPLAY=wayland-0 QT_QPA_PLATFORM=wayland _infinite_cam "$_hostname" ffplay "$_url" 1
+
